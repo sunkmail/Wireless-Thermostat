@@ -39,6 +39,10 @@ void setup() {
   //  OzOled.setNormalDisplay();       //Set display to Normal mode         -- In default setup
   //  OzOled.setPageMode();            //Set addressing mode to Page Mode   -- In default setup
 
+
+  // ************** RF Rx Module (433 MHz ASK Module) ******************
+//    Nothing to Set-up
+
   // Ready to go!
 
 }
