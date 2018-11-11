@@ -1,17 +1,27 @@
+
+
 /*
    To Do:
 
-      1) Confirm / Calibrate Temp sensor
+      -) Remove unneeded font characters to save space?
+      -) Make Temperature display routine - mDegreeC to (-)xx.x
+      0) Need pull-up on Reset? - seems to work without
       2) Add RF Tx'r - RFTransmitter.h - Some added to check compile size.  TinyRH too big
       3) Add power saving
       4) Optimise Code
+      5) Make larger font??      
+      
+      Todo's completed:
+      
+      - Confirm / Calibrate Temp sensor - Tested waterproof sensor - within 1/8 degree in ice water.
 */
 
 #include <TinyWireM.h>
 #include <TinyOzOLED.h>
 
 #include <OneWire.h>
-#include <DallasTemperature.h>
+//#include <DallasTemperature.h>
+//#include <DS18B20.h>   Possible smaller Altrnative to above - need to confirm
 
 #include <RFTransmitter.h>    // https://andreasrohner.at/posts/Electronics/New-Arduino-library-for-433-Mhz-AM-Radio-Modules/
 
@@ -59,11 +69,14 @@ const byte vCom = 0;
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
 
-// Pass our oneWire reference to Dallas Temperature.
-DallasTemperature sensors(&oneWire);
+byte rawTemp[2];              // Raw Sensor data - bypassing Dallas Library
 
-// arrays to hold device address
-DeviceAddress Thermometer_Address;
+unsigned long lastTempRequest = 0;
+const int delayInMillis = 750 / (1 << (12 - Resolution));
+
+bool tempPos = true;    // Is the temp 0 or above
+int mDegreeC = 0;       // Temperature in mili-Degrees C ... 12345 = 12.345C
+
 
 
 // **************************************************************
@@ -85,7 +98,3 @@ RFTransmitter RFTx(RadioOut_PIN,RFNodeID);               // Set up RF Tx library
 // **************** Global Variables ************
 unsigned long currentMillis;      // Working/scratchpad variable for checking times
 
-float tempC = 0;            // Temperature in Celcius
-
-unsigned long lastTempRequest = 0;
-const int delayInMillis = 750 / (1 << (12 - Resolution));
