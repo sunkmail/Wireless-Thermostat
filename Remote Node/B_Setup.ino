@@ -7,13 +7,7 @@ void setup() {
   pinMode(RadioOut_PIN, OUTPUT);      // Output to RF Transmit Data Pin
 
 
-  // ************* Temp Sensor Start & Setup ********************
-//  sensors.begin();
-//  sensors.getAddress(Thermometer_Address, 0);
-//  sensors.setResolution(Thermometer_Address, Resolution);    // set the resolution
-//  sensors.setWaitForConversion(false);
-//
-//  sensors.requestTemperatures();
+// ************* Temp Sensor Start & Setup ********************
 
     // Set resolution ... should be correct by default, but just in case. :)
   oneWire.reset(); 
@@ -25,15 +19,10 @@ void setup() {
   delay(10);
   oneWire.reset(); 
   
-// Do a read eeprom/scratchpad test on bootup to check resolution.  if already correct, do bother with above.
+// Do a read eeprom/scratchpad test on bootup to check resolution.  if already correct, don't bother with above.
 //  only impliment after above is working.
 
-
-  oneWire.reset(); 
-  oneWire.write(0xCC);  // Bypass ROM command - since only 1 sensor used
-  oneWire.write(0x44);  // Request Temp Conversion
-
-  //  delayInMillis = 750 / (1 << (12 - Resolution));   // Added as a const for 12 bit res.
+  requestTemp();  // Request Temp Conversion
   lastTempRequest = millis();
 
 
