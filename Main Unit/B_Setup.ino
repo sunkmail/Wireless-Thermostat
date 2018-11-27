@@ -31,7 +31,10 @@ void setup() {
   //  pinMode(A4, INPUT_PULLUP);      // I2C Line
   //  pinMode(A5, INPUT_PULLUP);      // I2C Line
 
+if(isDebug)
+  pinMode(13, OUTPUT);
 
+  
   // **************************************************************
   // **************** Rotary Encoder Setup ************************
 
@@ -88,6 +91,7 @@ void setup() {
     tempData[x][arrayDecimalDegrees] = 9;
   }
 
+virtualPosition = tempSetpointDefault;  // Set default Setpoint into virtualposition
 
 delay(100);         // Let everything settle for 100 ms on boot-up
 
