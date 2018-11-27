@@ -5,6 +5,7 @@ void getRawTemp(void) { // Get Raw Temperature Data
   rawTemp[0] = oneWire.read();
   rawTemp[1] = oneWire.read();
   oneWire.reset();        // Send Reset to stop sending or rest of scratchpad
+  tempDataRxTime[localNode] =  currentMillis;   // Sore time of most recent read
 }
 
 void requestTemp(void) {
