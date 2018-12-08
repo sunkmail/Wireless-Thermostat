@@ -31,10 +31,10 @@ void setup() {
   //  pinMode(A4, INPUT_PULLUP);      // I2C Line
   //  pinMode(A5, INPUT_PULLUP);      // I2C Line
 
-if(isDebug)
-  pinMode(13, OUTPUT);
+  if (isDebug)
+    pinMode(13, OUTPUT);
 
-  
+
   // **************************************************************
   // **************** Rotary Encoder Setup ************************
 
@@ -80,23 +80,21 @@ if(isDebug)
 
 
   requestTemp();  // Request Temp Conversion
-  
+
   //  lastTempRequest = millis();     // Now Done in requestTemp function ...
   // Make function return millis value?
   // ie, lastTempRequest = requestTemp(); - requests temp and sets value?
 
   for (byte x = 0; x <= (RFNodes - 1); x++) { // Set up default temp values in data Arrays to -99.9
-    tempData[x][arrayTempPos] = false;
-    tempData[x][arrayWholeDegrees] = 99;
-    tempData[x][arrayDecimalDegrees] = 9;
+    makeInvalid(x);
   }
 
-virtualPosition = tempSetpointDefault;  // Set default Setpoint into virtualposition
+  virtualPosition = tempSetpointDefault;  // Set default Setpoint into virtualposition
 
-delay(100);         // Let everything settle for 100 ms on boot-up
+  delay(100);         // Let everything settle for 100 ms on boot-up
 
-attachInterrupt(digitalPinToInterrupt(EncodeA_PIN), isr_EncoderKnob, LOW);     // Attach interrupt for encoder
+  attachInterrupt(digitalPinToInterrupt(EncodeA_PIN), isr_EncoderKnob, LOW);     // Attach interrupt for encoder
 
-// Ready to go!
-debugPrint("Setup finished successfully.", 1);
+  // Ready to go!
+  debugPrint(F("Setup finished successfully."), 1);
 }
