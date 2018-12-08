@@ -9,25 +9,19 @@ void loop() {
 
   // Get New Local Temp, if Available
   if ((currentMillis - lastTempRequest) >= delayInMillis) { // waited long enough??
-
     getRawTemp();                     // Get Raw Data
     requestTemp();                    // After fetching Data, request new sample
-
     ConvertRawTemp(localNode);        // Convert Raw data To useful Temperature Data
   }
 
-
   checkDataAge();                     // Check integrity of Data ... Has it been too long since last valid reading received?
 
-  controlNode = controlNodeRequested; // Try to use preferred Node, but ...
-  isControlValid();                   // If control node not valid, set Control to local node
-
-  //  debugPrint("Rotary Position: ");        // Display Rotary position value - Test confirmation
-  //  debugPrint(virtualPosition, 1);
+  isControlValid();                   // If Preferred control node not valid, set Control to local node
 
   updateSetpoint();                   // Update setpoint with virtual position value
 
-  if (tempData[controlNode][arrayTempPos] == true) { // If Control Node has valid data ...
+  //  if (tempData[controlNode][arrayTempPos] == true) { // If Control Node has valid data ...
+  if ((tempData[controlNode][arrayTempPos] == true) && (tempData[controlNode][arrayWholeDegrees] > 0) && (tempData[controlNode][arrayWholeDegrees] != 85) ) { // If Control Node has valid data ...
     systemError = false;                // Remove Error Flag, If present
     doSetpoint();                       // Compare current temp and turn on/off heating as required
   }
@@ -45,9 +39,9 @@ void loop() {
   // Get New RF Info, if Available
   getRfData();
 
-  //  debugPrint("Rotary Position: ");        // Display Rotary position value - Test confirmation
+  //  debugPrint(F("Rotary Position: "));        // Display Rotary position value - Test confirmation
   //  debugPrint(virtualPosition, 1);
 
-  doSetpoint();
+  // doSetpoint();
 
 }
