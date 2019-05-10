@@ -5,7 +5,7 @@ void getRawTemp(void) { // Get Raw Temperature Data
   rawTemp[0] = oneWire.read();
   rawTemp[1] = oneWire.read();
   oneWire.reset();        // Send Reset to stop sending or rest of scratchpad
-  tempDataRxTime[localNode] =  currentMillis;   // Sore time of most recent read
+  tempDataRxTime[localNode] =  currentMillis;   // Store time of most recent read
 }
 
 void requestTemp(void) {
@@ -37,15 +37,21 @@ void ConvertRawTemp(byte NodeID) {     // Convert Local Raw Temp & Store in refe
   }
   else
     tempData[NodeID][arrayTempPos] = true;
-    
+
   tempData[NodeID][arrayWholeDegrees] = _working >> 4;  // get temperature value of whole degrees
 
   _working = _working & 0x000F;             // Clear all bits above zero
   _working = _working * 625;                // convert sensor reading into 1/10000 of degrees ... 5000 = 0.5C
 
   tempData[NodeID][arrayDecimalDegrees] = (_working / 1000);   // drop least sig. digits to make into 1/10 of a degree ... 5 = 0.5C
-  
-  if (_working % 1000 >= 500){              // if the Most Significant dropped digit is 5 or more
-  tempData[NodeID][arrayDecimalDegrees]++;  // Round up
+
+  if (_working % 1000 >= 500) {             // if the Most Significant dropped digit is 5 or more
+    tempData[NodeID][arrayDecimalDegrees]++;  // Round up
   }
+
+  if (tempData[NodeID][arrayPackageID] != 255)
+    tempData[NodeID][arrayPackageID]++;       // Increment 'PacketID' # - To help trace any errors
+  else
+  
+    tempData[NodeID][arrayPackageID] = 1;
 }
