@@ -3,30 +3,12 @@ const bool isDebug = true;              // Debug messages?
 
 
 // Testing Errors Found:
-//      Setpoint temp raises - was set to 22, found it set at 24.
-//        Unable to reproduce on purpose
-//          suspect false trigger on encoder ... trying:  increase encoder debounce time
-//                                              if not, try hardware debounce
-//      Was having 'errors' and "heatOn' cyclings
-
-//    Made hardwired soldered board - Seems to haave settled down encoder creep
 
 //    Made setpoint to (setpoint -1) - needed to increase hysterysis
+  // 1 Degreee on each side too much ... make active temp in 1/10 degree increments. Turn on/off 0.5 above and below setpoint.
  
-//    increased reject time to 13 sec to try to avoid read errors
+//    increased reject time to 20 sec to try to avoid read errors - Will be Minutes for final
 
-
-// Before using any F():
-//Sketch uses 14660 bytes (47%) of program storage space. Maximum is 30720 bytes.
-//Global variables use 1409 bytes (68%) of dynamic memory, leaving 639 bytes for local variables. Maximum is 2048 bytes
-//
-//After Adding F()'s:
-//Sketch uses 14800 bytes (48%) of program storage space. Maximum is 30720 bytes.
-//Global variables use 1131 bytes (55%) of dynamic memory, leaving 917 bytes for local variables. Maximum is 2048 bytes.
-//
-// With isDebug = False:
-//Sketch uses 13112 bytes (42%) of program storage space. Maximum is 30720 bytes.
-//Global variables use 952 bytes (46%) of dynamic memory, leaving 1096 bytes for local variables. Maximum is 2048 bytes.
 
 
 
@@ -38,7 +20,8 @@ const bool isDebug = true;              // Debug messages?
 
 /*
    To Do ...   MARK OFF WHEN COMPLETED
-    Done -  With Wired connection - Make RF receiver work for single transmiter
+    Done - RF Rx works for 1 WIRELESS remote node
+    Done - With Wired connection - Make RF receiver work for single transmiter
     Done - Display sent data to screen
     Done - Make local Temp and Remote both display on screen
     Done - set invalid data to -99.9
@@ -51,14 +34,28 @@ const bool isDebug = true;              // Debug messages?
     Done - Switch back to prefered (remote)node when new data received for at least X consecutive packets
 
 
+    - Make active temp in 10x temp - 25.1 -> 251
+      - Make hysteresis 0.5 Degree each side
 
-    - Make/Test RF Rx works for multiple WIRED remote nodes - use resistor between each Tx and Rx'r????
+    - Make Default page for easy changes - .h file?
+
+    - Make base number routine for RF frrquency so other modules can all be using same base number.
+      - Routine would take base # x 3.  0 is always base station, need 3 for remote nodes.
+        - Node code to take base # and node number (1-3?) to program nodes
+    
+    - Add menu system
+     - Main Menu
+       - Control Node
+       - Brightness
+       - Defaults
+         - Default Setpoint
+         - Default control node
+         - Hysteresis
 
     - Add EEPROM Storage for last set values
           - Setpoint
           - Preferred Control Node
 
-    - Make/Test RF Rx works for 1 WIRELESS remote node
     - Make/Test RF Rx works for multiple WIRELESS remote nodes
 
     - Add RTC Module
@@ -85,9 +82,9 @@ const bool isDebug = true;              // Debug messages?
       Hardware Sections:
         DS18B20 Temp. Sensor
         0.96" 128x64 OLED, I2C
-        433 MHz Radio Module
+        433 MHz Radio Rx Superhyterodyne Module
         Rotary Encoder, with push button switch
-        12 VDC SPDT Relay
+        5 VDC SPDT Relay
         "Tiny RTC" I2C Real time Clock module
 */
 
@@ -102,9 +99,9 @@ const bool isDebug = true;              // Debug messages?
 // ************** Rotary Encoder Assignments ********************
 
 
-const byte EncodeA_PIN = 3;      // HW Int1 - CLK signal from Rotary Encoder (Pin A) - Used for generating interrupts
-const byte EncodeB_PIN = 4;      // DT (data) signal from Rotary Encoder (Pin B) - Used for reading direction
-const byte EncodeSW_PIN = 5;     // Push button switch on Rotary Encoder
+const byte EncodeA_PIN = 2;      // HW Int1 - CLK signal from Rotary Encoder (Pin A) - Used for generating interrupts
+const byte EncodeB_PIN = 3;      // DT (data) signal from Rotary Encoder (Pin B) - Used for reading direction
+const byte EncodeSW_PIN = 4;     // Push button switch on Rotary Encoder
 
 const byte EncoderBounce = 15;       // Encoder Debounce time (max) in milliseconds   Was 5. Setting sometimes changed
 const byte SwBounce = 50;           // Encoder Debounce time (max) in milliseconds
@@ -122,8 +119,6 @@ const byte HeatOn_PIN = 15;       // Pin Assignment for HeatOn (15 = A1) - To ac
 
 //const byte RadioIn_PIN = 2;      // Pin Assignment for Radio Input- Make easiest for PCB Routing
 const byte RadioIn_PIN = 17;      // Pin Assignment for Radio Input (17 = A3) - Made easiest for SMD PCB Routing
-
-const byte Pot_PIN = A0;         // Pin Assignment for Potentiometer - Not currently implemented
 
 const byte TempSense_PIN = 9;
 
@@ -156,7 +151,7 @@ const byte tempSetpointMax = 27;         // Maximum value for tempSetpoint
 const byte expiryTimeMin = 2;
 //const unsigned long expiryTime = (expiryTimeMin * 60 * 1000);   // Expiry time converted from min to ms
 
-const unsigned long expiryTime = 13000;        // FOR TESTING - MAKE SHORT - Remote units on 3 sec send - set to 13 sec
+const unsigned long expiryTime = 20000;        // FOR TESTING - MAKE SHORT - Remote units on 3 sec send - set to 20 sec
 
 
 // **************************************************************
@@ -186,10 +181,7 @@ RFReceiver RfRx(RadioIn_PIN, RfPulseLength);          // Setup with my custom pu
 // 0.96" OLED display module  128x64  -I2C 7-bit address 0x3C ??
 /* Constructor */
 // U8G2_SSD1306_128X64_NONAME_1_HW_I2C(rotation, [reset [, clock, data]])
-U8G2_SSD1306_128X64_NONAME_1_HW_I2C OLED(U8G2_R0);  // roation only setting due to HW I2C and no reset pin
-
-//U8G2_SSD1306_128X64_NONAME_1_HW_I2C OLED(U8G2_R2);  // roation only setting due to HW I2C and no reset pin
-
+U8G2_SSD1306_128X64_NONAME_1_HW_I2C OLED(U8G2_R2);  // roation only setting due to HW I2C and no reset pin
 
 
 // **************************************************************
@@ -223,7 +215,7 @@ byte tempData[RFNodes][4];    // (RFNodes = 4) Rows x 4 Column array for node da
 // Columns 0 - 3 are: tempPos, wholeDegreeC, decimalDegreeC, packageId
 
 unsigned long tempDataRxTime[RFNodes];  // Array to hold time of most recent data Rx from each node
-// Position 0 not used - can spare memory to make coding easier though
+
 
 byte tempSetpoint = tempSetpointDefault;  // Set default Setpoint into setpoint value
 
