@@ -47,11 +47,20 @@ void updateSetpoint(void) {
 // ------------------------------------------------------------------
 void doSetpoint(void) {
 
+    // Changed function process - Now:
+    // if setpoint is 21:
+        // Heat turns on at 19.9  (Setpoint[whole degrees]-1) = 21-1 = 20.  (<20 = 19.x)
+        // Heat turns off at 21.0
+              // Thermal mass of heating system should cause heat to contiue to enter environment after heating turned off
+              // Should provide decent hysterysis 
+        // if more hysterysis needed, change heat off if statement to >, from >=.
+        
+
   //  if( temp < setpoint ) -> turn on heat
   if (tempData[controlNode][arrayWholeDegrees] < (tempSetpoint-1)) {      // If controlling Node temp is less than setpoint - Assumption made: inside temp will never go below zero
     digitalWrite(HeatOn_PIN, HIGH);                                   // Turn Heating ON. (Activate Relay)
   }
-  else if (tempData[controlNode][arrayWholeDegrees] > tempSetpoint) { //Using '>' Vs. '>=' gives 1.1 Vs. 0.1 Degrees of Hysterysis
+  else if (tempData[controlNode][arrayWholeDegrees] >= tempSetpoint) { //Using '>' Vs. '>=' gives 1.1 Vs. 0.1 Degrees of Hysterysis
     digitalWrite(HeatOn_PIN, LOW);                                     // Turn Heating off. (De-Energise Relay)
   }
 
