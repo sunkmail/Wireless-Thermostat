@@ -27,7 +27,7 @@ void setup() {
   pinMode(A0, INPUT_PULLUP);
   pinMode(A1, INPUT_PULLUP);
   pinMode(A2, INPUT_PULLUP);
-  pinMode(A3, INPUT_PULLUP);
+//  pinMode(A3, INPUT_PULLUP);
   //  pinMode(A4, INPUT_PULLUP);      // I2C Line
   //  pinMode(A5, INPUT_PULLUP);      // I2C Line
 
@@ -78,7 +78,8 @@ void setup() {
   // Do a read eeprom/scratchpad test on bootup to check resolution.  if already correct, do bother with above.
   //  only impliment after above is working.
 
-
+  tempDataRxTime[localNode] = 0;      // Set initial Value for local node's last temp data.
+  
   requestTemp();  // Request Temp Conversion
 
   //  lastTempRequest = millis();     // Now Done in requestTemp function ...
