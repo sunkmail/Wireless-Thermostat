@@ -92,11 +92,11 @@ byte decimalDegreeC = 0;  // Only send 1 Sig. Bit
     2 = Den Temperature Sensor
     3 = Outside Temperature Sensor
 */
-const byte RfNodeID = 1;                    // Set this unit to Node # to identify signal source
+const byte RfNodeID = 3;                    // Set this unit to Node # to identify signal source
 
-unsigned int RfPulseLength = 250;           // Time of each pulse section in uSec  - Bigger = more stable, but slower 
-unsigned int RfBackoffDelay = 100;          // time in milliseconds between the repeated transmissions
-byte RfResendCount = 2;                     // number of times the transmission of a packet is repeated.  More = Better data integrity, but slower
+const unsigned int RfPulseLength = 250;           // Time of each pulse section in uSec  - Bigger = more stable, but slower 
+const unsigned int RfBackoffDelay = 100;          // time in milliseconds between the repeated transmissions
+const byte RfResendCount = 2;                     // number of times the transmission of a packet is repeated.  More = Better data integrity, but slower
 
 //RFTransmitter(byte outputPin, byte nodeId = 0, unsigned int pulseLength = 100, unsigned int backoffDelay = 100, byte resendCount = 1) 
 RFTransmitter RfTx(RadioOut_PIN,RfNodeID,RfPulseLength,RfBackoffDelay,RfResendCount);  // Set up RF Tx library on RadioOut Pin, set NodeID
