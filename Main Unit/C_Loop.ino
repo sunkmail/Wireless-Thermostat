@@ -12,6 +12,9 @@ void loop() {
     getRawTemp();                     // Get Raw Data
     requestTemp();                    // After fetching Data, request new sample
     ConvertRawTemp(localNode);        // Convert Raw data To useful Temperature Data
+    if(isDebug){
+//      debugTemp();                    // Show Temp reading for Debugging
+    }
   }
 
   checkDataAge();                     // Check integrity of Data ... Has it been too long since last valid reading received?
@@ -44,4 +47,18 @@ void loop() {
 
   // doSetpoint();
 
+}
+
+
+void debugTemp(void){
+  debugPrint("Sensor Reading:  ");
+  if(tempData[localNode][arrayTempPos] == 0)
+    debugPrint("-");
+  else
+    debugPrint("+");
+  debugPrint(tempData[localNode][arrayWholeDegrees]);
+  debugPrint(".");
+  debugPrint(tempData[localNode][arrayDecimalDegrees]);
+  debugPrint("    Packet: ");
+  debugPrint(tempData[localNode][arrayPackageID],1);
 }
